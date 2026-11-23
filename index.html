@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIGENÈRE CIPHER</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="container">
+        <header>
+            <div class="title-area">
+                <h1>VIGENÈRE CIPHER</h1>
+                <p class="subtitle">Interactive Polyalphabetic Encryption & Decryption Tool</p>
+            </div>
+            <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">☀️</button>
+        </header>
+
+        <main class="workspace">
+            <section class="panel left-panel">
+                <div class="mode-tabs">
+                    <button id="tabEncrypt" class="tab-btn active">Encrypt</button>
+                    <button id="tabDecrypt" class="tab-btn">Decrypt</button>
+                </div>
+
+                <div class="input-group">
+                    <label for="messageInput">Message</label>
+                    <textarea id="messageInput" placeholder="Enter plaintext to encrypt..."></textarea>
+                    <div id="messageError" class="error-msg"></div>
+                </div>
+
+                <div class="input-group">
+                    <label for="keyInput">Secret Key</label>
+                    <div class="key-input-wrapper">
+                        <input type="password" id="keyInput" placeholder="e.g., LEMON">
+                        <button id="toggleKeyBtn" class="icon-btn" aria-label="Toggle key visibility">👁️</button>
+                    </div>
+                    <div id="keyError" class="error-msg"></div>
+                </div>
+
+                <div class="action-row">
+                    <button id="encryptBtn" class="primary-btn encrypt-theme">Encrypt</button>
+                    <button id="decryptBtn" class="primary-btn decrypt-theme">Decrypt</button>
+                    <button id="clearBtn" class="secondary-btn">Clear</button>
+                </div>
+
+                <div class="generator-section box">
+                    <h3>Random Key Generator</h3>
+                    <div class="gen-controls">
+                        <select id="keyLengthSel">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                        <input type="number" id="customKeyLength" placeholder="Len" min="1" max="100" style="display:none;">
+                        <button id="generateKeyBtn" class="secondary-btn">Generate</button>
+                    </div>
+                    <div class="gen-result">
+                        <span id="generatedKeyDisplay"></span>
+                        <button id="useKeyBtn" class="secondary-btn" style="display:none;">Use This Key</button>
+                    </div>
+                </div>
+
+                <div class="stats-panel box">
+                    <h3>Live Input Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card"><span>Characters</span><strong id="statChars">0</strong></div>
+                        <div class="stat-card"><span>Letters</span><strong id="statLetters">0</strong></div>
+                        <div class="stat-card"><span>Spaces</span><strong id="statSpaces">0</strong></div>
+                        <div class="stat-card"><span>Numbers</span><strong id="statNumbers">0</strong></div>
+                        <div class="stat-card"><span>Special</span><strong id="statSpecial">0</strong></div>
+                        <div class="stat-card"><span>Key Length</span><strong id="statKeyLen">0</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel right-panel">
+                <div class="input-group">
+                    <label for="resultOutput">Result</label>
+                    <textarea id="resultOutput" readonly></textarea>
+                </div>
+
+                <div class="action-row">
+                    <button id="copyResultBtn" class="secondary-btn accent">Copy Result</button>
+                    <button id="downloadTxtBtn" class="secondary-btn">Download TXT</button>
+                    <button id="downloadCsvBtn" class="secondary-btn">Download CSV</button>
+                </div>
+
+                <div class="alignment-section box">
+                    <h3>Key Alignment</h3>
+                    <div class="scroll-container">
+                        <pre id="keyAlignment"></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <section class="examples-section">
+            <h3>Predefined Examples</h3>
+            <div class="examples-grid">
+                <div class="example-card" data-idx="0">
+                    <h4>Classic Example</h4>
+                    <p>ATTACK AT DAWN / LEMON</p>
+                </div>
+                <div class="example-card" data-idx="1">
+                    <h4>Short Key</h4>
+                    <p>HELLO WORLD / KEY</p>
+                </div>
+                <div class="example-card" data-idx="2">
+                    <h4>Mixed Characters</h4>
+                    <p>Hello, World! 123 / SECRET</p>
+                </div>
+            </div>
+        </section>
+
+        <details id="processSection">
+            <summary>Show Encryption/Decryption Process <span class="chevron">▼</span></summary>
+            <div class="details-content">
+                <div class="action-row right-align">
+                    <button id="copyStepsBtn" class="secondary-btn">Copy Steps</button>
+                    <button id="downloadStepsBtn" class="secondary-btn">Download Steps</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="processTable">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Input Char</th>
+                                <th>Value (P/C)</th>
+                                <th>Key Char</th>
+                                <th>Value (K)</th>
+                                <th>Calculation</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </details>
+
+        <details id="tableauSection">
+            <summary>Vigenère Tableau <span class="chevron">▼</span></summary>
+            <div class="details-content">
+                <div class="table-responsive">
+                    <table id="tableau"></table>
+                </div>
+            </div>
+        </details>
+
+        <details id="mathSection">
+            <summary>Mathematical Explanation <span class="chevron">▼</span></summary>
+            <div class="details-content box">
+                <p>The Vigenère cipher can be described algebraically. If the letters A–Z are taken to be the numbers 0–25:</p>
+                <ul>
+                    <li><strong>Encryption:</strong> C = (P + K) mod 26</li>
+                    <li><strong>Decryption:</strong> P = (C - K + 26) mod 26</li>
+                </ul>
+                <p>Where <code>P</code> is the plaintext letter, <code>K</code> is the key letter, and <code>C</code> is the ciphertext letter.</p>
+                <p><strong>Example:</strong> T(19) encrypted with E(4) ➔ (19 + 4) mod 26 = 23 mod 26 = 23(X).</p>
+            </div>
+        </details>
+
+        <details id="eduAboutSection">
+            <summary>About Vigenère Cipher <span class="chevron">▼</span></summary>
+            <div class="details-content box text-content">
+                <p>The Vigenère cipher is a method of encrypting alphabetic text by using a series of interwoven Caesar ciphers, based on the letters of a keyword. It employs a form of polyalphabetic substitution.</p>
+                <p>Though the cipher is easy to understand and implement, for three centuries it resisted all attempts to break it, earning the description <em>le chiffre indéchiffrable</em> (the indecipherable cipher).</p>
+                <p>It was originally described by Giovan Battista Bellaso in 1553, but was misattributed to Blaise de Vigenère in the 19th century.</p>
+                <p class="disclaimer"><strong>Disclaimer:</strong> This cipher is not secure by modern standards and is provided for educational purposes only.</p>
+            </div>
+        </details>
+
+        <details id="eduVsCaesarSection">
+            <summary>Caesar vs Vigenère Comparison <span class="chevron">▼</span></summary>
+            <div class="details-content box text-content">
+                <p><strong>Caesar Cipher:</strong> A monoalphabetic substitution where each letter in the plaintext is shifted by a fixed amount. For example, a shift of 3 turns A into D. Because the shift is uniform, the frequency distribution of letters in the ciphertext is identical to the plaintext, just shifted. This makes it trivial to break using frequency analysis.</p>
+                <p><strong>Vigenère Cipher:</strong> A polyalphabetic substitution where the shift value changes for each letter based on a repeating keyword. The letter 'E' in the plaintext might be encrypted as 'X', 'M', or 'P' depending on its position relative to the key. This flattens the frequency distribution, masking the underlying language patterns and making simple frequency analysis ineffective.</p>
+            </div>
+        </details>
+
+        <details id="eduSecuritySection">
+            <summary>Why Vigenère Is Not Secure Today <span class="chevron">▼</span></summary>
+            <div class="details-content box text-content">
+                <p>The primary weakness of the Vigenère cipher is the repeating nature of its key. If a cryptanalyst can determine the length of the key, they can treat the cipher as a series of interleaved Caesar ciphers.</p>
+                <ul>
+                    <li><strong>Kasiski Examination:</strong> Discovered by Friedrich Kasiski in 1863, this method looks for repeated sequences of characters in the ciphertext. The distances between these repeats are often multiples of the key length.</li>
+                    <li><strong>Friedman Test (Index of Coincidence):</strong> Invented by William F. Friedman in 1920, this statistical measure determines the likelihood that two randomly drawn letters from a text are identical, helping estimate key length without finding repeated sequences.</li>
+                    <li><strong>Frequency Analysis:</strong> Once the key length <em>L</em> is known, the ciphertext is divided into <em>L</em> columns. Each column is essentially encrypted with a single Caesar shift and can be easily broken using standard frequency analysis.</li>
+                </ul>
+            </div>
+        </details>
+
+        
+    </div>
+    
+    <div id="toast" class="toast">Copied!</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
